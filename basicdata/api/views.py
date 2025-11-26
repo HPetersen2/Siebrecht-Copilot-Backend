@@ -1,6 +1,6 @@
 from rest_framework import generics
-from basicdata.models import CustomerGroup, Brand, VehicleModel, VehicleType, PaydType
-from .serializers import CustomerGroupListSerializer, BrandListSerializer, VehicleModelListSerializer, VehicleTypeListSerializer, PaydTypeListSerializer
+from basicdata.models import CustomerGroup, Brand, VehicleModel, VehicleType, PaydType, SellerChannel, PromotionCode
+from .serializers import CustomerGroupListSerializer, BrandListSerializer, VehicleModelListSerializer, VehicleTypeListSerializer, PaydTypeListSerializer, SellerChannelListSerializer, PromotionCodeListSerializer
 
 class CustomerGroupView(generics.ListAPIView):
     queryset = CustomerGroup.objects.all()
@@ -27,3 +27,11 @@ class VehiclesTypeView(generics.ListAPIView):
 class PaydTypeView(generics.ListAPIView):
     queryset = PaydType.objects.all()
     serializer_class = PaydTypeListSerializer
+
+class SellerChannelView(generics.ListAPIView):
+    queryset = SellerChannel.objects.all()
+    serializer_class = SellerChannelListSerializer
+
+class PromotionCodeView(generics.ListAPIView):
+    queryset = PromotionCode.objects.all()
+    serializer_class = PromotionCodeListSerializer

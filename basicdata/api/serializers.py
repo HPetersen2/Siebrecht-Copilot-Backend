@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from basicdata.models import CustomerGroup, VehicleModel, Brand, VehicleType, PaydType
+from basicdata.models import CustomerGroup, VehicleModel, Brand, VehicleType, PaydType, SellerChannel, PromotionCode
 
 class CustomerGroupListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,4 +24,14 @@ class VehicleTypeListSerializer(serializers.ModelSerializer):
 class PaydTypeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaydType
+        fields = ['name']
+
+class SellerChannelListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SellerChannel
+        fields = ['name']
+
+class PromotionCodeListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PromotionCode
         fields = ['name']

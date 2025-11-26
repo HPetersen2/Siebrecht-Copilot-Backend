@@ -91,6 +91,10 @@ class Discount(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = "Nachlass"
+        verbose_name_plural = "Nachlässe"
+
     def __str__(self):
         valid_from_str = self.valid_from.strftime("%d.%m.%Y")
         valid_to_str = self.valid_to.strftime("%d.%m.%Y") if self.valid_to else "offen"

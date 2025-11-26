@@ -55,3 +55,25 @@ class PaydType(models.Model):
 
     def __str__(self):
         return self.name
+    
+class SellerChannel(models.Model):
+    name = models.CharField(max_length=150)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Verkaufskanal"
+        verbose_name_plural = "Verkaufskanäle"
+
+    def __str__(self):
+        return self.name
+    
+class PromotionCode(models.Model):
+    name = models.CharField(max_length=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Promotioncode"
+        verbose_name_plural = "Promotioncodes"
+
+    def __str__(self):
+        return self.name
