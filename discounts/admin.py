@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin import RelatedOnlyFieldListFilter
 from .models import Discount
 from .forms import DiscountForm
 
@@ -6,7 +7,12 @@ from .forms import DiscountForm
 class DiscountAdmin(admin.ModelAdmin):
     form = DiscountForm
     list_display = ('discount_name', 'valid_period', 'discount_amount', 'model_list')
-    list_filter = ('discount_type', 'valid_from', 'valid_to')
+    list_filter = (
+        'discount_type',
+        'valid_from',
+        'valid_to',
+        ('model', RelatedOnlyFieldListFilter),
+    )
     search_fields = ('discount_name', 'description')
     ordering = ('-valid_from',)
 
