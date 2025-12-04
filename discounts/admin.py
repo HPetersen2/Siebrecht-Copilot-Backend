@@ -1,10 +1,11 @@
 from django.contrib import admin
 from django.contrib.admin import RelatedOnlyFieldListFilter
+from import_export.admin import ImportExportModelAdmin
 from .models import Discount
 from .forms import DiscountForm
 
 @admin.register(Discount)
-class DiscountAdmin(admin.ModelAdmin):
+class DiscountAdmin(ImportExportModelAdmin):
     form = DiscountForm
     list_display = ('discount_name', 'valid_period', 'discount_amount', 'model_list')
     list_filter = (
