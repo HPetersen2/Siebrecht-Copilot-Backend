@@ -3,6 +3,7 @@ services:
   db:
     image: postgres:latest
     container_name: siebrecht_copilot_database
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -12,11 +13,18 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis:latest
+    container_name: copilot_siebrecht_redis
+    volumes:
+      - redis_data:/data
+
   web:
     build:
       context: .
       dockerfile: Dockerfile
     env_file: .env
+    restart: unless-stopped
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
@@ -28,16 +36,8 @@ services:
     depends_on:
       - db
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "8080:80"
-
 
 volumes:
   static_volume:
   postgres_data:
+  redis_data:
