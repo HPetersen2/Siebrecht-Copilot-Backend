@@ -21,6 +21,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('django-rq/', include('django_rq.urls')),
     path('api/', include('core.api_urls'))
 ]
 
