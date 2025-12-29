@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -35,10 +36,10 @@ CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", default="http://lo
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4200',
     "http://127.0.0.1:5500",
-    "http://localhost:5500",
+    "http://localhost:4200",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 
 # Application definition
@@ -53,6 +54,8 @@ INSTALLED_APPS = [
     'import_export',
     'corsheaders',
     'rest_framework',
+    'django_rq',
+    'auth_app',
     'basicdata',
     'checklist',
     'discounts',
@@ -101,6 +104,27 @@ DATABASES = {
         "HOST": os.environ.get("DB_HOST", default="db"),
         "PORT": os.environ.get("DB_PORT", default=5432)
     }
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ.get("REDIS_LOCATION", default="redis://redis:6379/1"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "videoflix"
+    }
+}
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': os.environ.get("REDIS_HOST", default="redis"),
+        'PORT': os.environ.get("REDIS_PORT", default=6379),
+        'DB': os.environ.get("REDIS_DB", default=0),
+        'DEFAULT_TIMEOUT': 900,
+        'REDIS_CLIENT_KWARGS': {},
+    },
 }
 
 
@@ -156,4 +180,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ]
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1)
 }
