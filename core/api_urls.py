@@ -5,4 +5,5 @@ urlpatterns = [
     path('', include('basicdata.api.urls')),
     path('', include('checklist.api.urls')),
     path('', include('discounts.api.urls')),
+    path('', include('cars.api.urls')),
 ]
