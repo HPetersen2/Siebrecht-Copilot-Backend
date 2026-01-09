@@ -1,10 +1,9 @@
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 
-
 def send_reset_password_email(saved_account, verification_link):
     """Sends a password reset email with a verification link."""
-    subject = 'Reset your password'
+    subject = 'Passwort zurücksetzen'
     from_email = None
     context = {
         'email': saved_account,
