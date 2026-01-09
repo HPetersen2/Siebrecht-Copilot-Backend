@@ -10,20 +10,25 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    networks:
+      - app_network
 
   redis:
-    image: redis:latest
-    container_name: copilot_siebrecht_redis
+    image: redis:8.4.0
+    container_name: siebrecht_copilot_redis
+    restart: unless-stopped
     volumes:
       - redis_data:/data
+    networks:
+      - app_network
 
-  web:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file: .env
+    container_name: siebrecht_copilot_backend
+    env_file: 
+      - .env
     restart: unless-stopped
     volumes:
       - .:/app
@@ -35,9 +40,35 @@ services:
       - PYTHONUNBUFFERED=1
     depends_on:
       - db
+      - redis
+    networks:
+      - app_network
 
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: siebrecht_copilot_worker
+    env_file:
+      - .env
+    restart: unless-stopped
+    command: python manage.py rqworker default
+    volumes:
+      - .:/app
+      - ./media:/app/media
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - redis
+      - db
+    networks:
+      - app_network
 
 volumes:
   static_volume:
   postgres_data:
   redis_data:
+
+networks:
+  app_network:
+    driver: bridge
