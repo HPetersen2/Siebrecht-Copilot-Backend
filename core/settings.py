@@ -18,8 +18,6 @@ import environ
 
 load_dotenv()
 
-environ.Env.read_env()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -182,16 +180,23 @@ env = environ.Env(
     EMAIL_USE_SSL=(bool, False),
 )
 
-EMAIL_BACKEND = os.getenv(
-    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend'
+environ.Env.read_env(BASE_DIR / ".env")
+
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND",
+    default="django.core.mail.backends.smtp.EmailBackend",
 )
-EMAIL_HOST=os.getenv('EMAIL_HOST')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
-EMAIL_HOST_USER=os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD=os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = env('EMAIL_USE_TLS')
-EMAIL_USE_SSL = env('EMAIL_USE_SSL')
-DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL')
+
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS")
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL")
+
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
