@@ -19,12 +19,13 @@ class Car(models.Model):
     seller_channel = models.ForeignKey(SellerChannel, on_delete=models.PROTECT)
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.PROTECT)
     tax_id = models.CharField(max_length=50, null=True, blank=True)
-    upe = models.IntegerField()
+    upe = models.DecimalField(max_digits=10, decimal_places=2)
     custom_public_values = models.JSONField(default=dict)
+    checklist_state = models.JSONField(default=dict, blank=True)
 
     class Meta:
-        verbose_name = "Auto"
-        verbose_name_plural = "Autos"
+        verbose_name = "Vorgang"
+        verbose_name_plural = "Vorgänge"
 
     def __str__(self):
         return f"{self.customer_name} - {self.brand} {self.model}"

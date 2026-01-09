@@ -3,49 +3,78 @@ from cars.models import Car
 from basicdata.models import Brand, CustomerGroup, VehicleModel, VehicleType, PaydType, SellerChannel, PromotionCode
 
 class CarSerializer(serializers.ModelSerializer):
+    customerName = serializers.CharField(source='customer_name')
     selectedBrand = serializers.CharField(write_only=True)
-    selectedGroup = serializers.CharField(write_only=True)
     selectedModel = serializers.CharField(write_only=True)
     selectedPayd = serializers.CharField(write_only=True)
-    selectedPromotionCode = serializers.CharField(write_only=True, required=False, allow_null=True)
-    selectedSellerChannel = serializers.CharField(write_only=True)
     selectedVehicleType = serializers.CharField(write_only=True)
-    customPublicValues = serializers.JSONField(source='custom_public_values')
-    customerName = serializers.CharField(source='customer_name')
-    taxID = serializers.CharField(source='tax_id', required=False, allow_null=True)
+    selectedSellerChannel = serializers.CharField(write_only=True)
+    selectedGroup = serializers.CharField(write_only=True, required=False)
+    selectedPromotionCode = serializers.PrimaryKeyRelatedField(
+        source='promotion_code', 
+        queryset=PromotionCode.objects.all(), 
+        allow_null=True,   # Erlaubt den Wert null/None
+        required=False     # Erlaubt, dass der Key im JSON komplett fehlt
+    )
+    
+    checklistState = serializers.JSONField(source='checklist_state', required=False)
+    customPublicValues = serializers.JSONField(source='custom_public_values', required=False)
+    
+    taxID = serializers.CharField(source='tax_id', allow_null=True, required=False)
+    
+    brandName = serializers.CharField(source='brand.name', read_only=True)
+    modelName = serializers.CharField(source='model.name', read_only=True)
 
     class Meta:
         model = Car
-        fields = ['selectedBrand', 'selectedGroup', 'selectedModel', 'selectedPayd', 'selectedPromotionCode', 'selectedSellerChannel', 'selectedVehicleType', 'customPublicValues', 'customerName', 'taxID', 'upe', 'creator', 'created_at', 'updated_at']
-        read_only_fields = ('creator', 'created_at', 'updated_at')
+        fields = [
+            'id', 'customerName', 'selectedBrand', 'selectedModel', 'selectedPayd', 
+            'selectedVehicleType', 'selectedSellerChannel', 'selectedGroup',
+            'selectedPromotionCode', 'taxID', 'upe', 'customPublicValues', 'checklistState',
+            'creator', 'created_at', 'updated_at', 'brandName', 'modelName'
+        ]
+        read_only_fields = ('creator', 'created_at', 'updated_at', 'id')
+
+    def _handle_foreign_keys(self, validated_data):
+        """Hilfsmethode, um Strings in Model-Instanzen aufzulösen"""
+        brand_name = validated_data.pop('selectedBrand', None)
+        model_name = validated_data.pop('selectedModel', None)
+        payd_name = validated_data.pop('selectedPayd', None)
+        v_type_name = validated_data.pop('selectedVehicleType', None)
+        channel_name = validated_data.pop('selectedSellerChannel', None)
+        
+        if brand_name:
+            validated_data['brand'] = Brand.objects.get(name=brand_name)
+        if model_name:
+            validated_data['model'] = VehicleModel.objects.get(name=model_name)
+        if payd_name:
+            validated_data['payd_type'] = PaydType.objects.get(name=payd_name)
+        if v_type_name:
+            validated_data['vehicle_type'] = VehicleType.objects.get(name=v_type_name)
+        if channel_name:
+            validated_data['seller_channel'] = SellerChannel.objects.get(name=channel_name)
+            
+        if 'selectedGroup' not in validated_data:
+            validated_data['customer_group'] = CustomerGroup.objects.first()
+
+        return validated_data
 
     def create(self, validated_data):
-        selected_brand = validated_data.pop('selectedBrand')
-        selected_group = validated_data.pop('selectedGroup')
-        selected_model = validated_data.pop('selectedModel')
-        selected_payd = validated_data.pop('selectedPayd')
-        selected_promotion_code = validated_data.pop('selectedPromotionCode')
-        selected_seller_channel = validated_data.pop('selectedSellerChannel')
-        selected_vehicle_type = validated_data.pop('selectedVehicleType')
+        validated_data = self._handle_foreign_keys(validated_data)
+        
+        if 'creator' not in validated_data:
+            validated_data['creator'] = self.context['request'].user
+            
+        return super().create(validated_data)
 
-        brand = Brand.objects.get(name=selected_brand)
-        customer_group = CustomerGroup.objects.get(name=selected_group)
-        model = VehicleModel.objects.get(name=selected_model, brand=brand)
-        payd_type = PaydType.objects.get(name=selected_payd)
-        seller_channel = SellerChannel.objects.get(name=selected_seller_channel)
-        vehicle_type = VehicleType.objects.get(name=selected_vehicle_type)
-        promotion_code = None
-        if selected_promotion_code:
-            promotion_code = PromotionCode.objects.get(name=selected_promotion_code)
+    def update(self, instance, validated_data):
+        validated_data = self._handle_foreign_keys(validated_data)
+        return super().update(instance, validated_data)
+    
 
-        car = Car.objects.create(
-            brand=brand,
-            customer_group=customer_group,
-            model=model,
-            payd_type=payd_type,
-            seller_channel=seller_channel,
-            vehicle_type=vehicle_type,
-            promotion_code=promotion_code,
-            **validated_data
-        )
-        return car
+class CarNameSerializer(serializers.ModelSerializer):
+    customerName = serializers.CharField(source='customer_name')
+
+    class Meta:
+        model = Car
+        fields = ['id', 'customerName']
