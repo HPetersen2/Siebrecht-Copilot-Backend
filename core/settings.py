@@ -34,11 +34,7 @@ DEBUG = os.getenv('DEBUG', default=True)
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", default="localhost").split(",")
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", default="http://localhost:4200").split(",")
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:4200',
-    "http://127.0.0.1:5500",
-    "http://localhost:4200",
-]
+CORS_ALLOWED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", default="http://localhost:4200").split(",")
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -101,7 +97,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.environ.get("DB_NAME", default="siebrecht_copilot_database"),
-        "USER": os.environ.get("DB_USER", default="admin"),
+        "USER": os.environ.get("DB_USER", default="administrator"),
         "PASSWORD": os.environ.get("DB_PASSWORD", default="supersecretpassword"),
         "HOST": os.environ.get("DB_HOST", default="db"),
         "PORT": os.environ.get("DB_PORT", default=5432)
@@ -115,7 +111,7 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
-        "KEY_PREFIX": "videoflix"
+        "KEY_PREFIX": "copilot"
     }
 }
 
