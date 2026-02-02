@@ -24,7 +24,7 @@ class Brand(models.Model):
     
 class VehicleModel(models.Model):
     name = models.CharField(max_length=50)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="vehicle_models")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

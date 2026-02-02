@@ -8,10 +8,16 @@ class CarsDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CarSerializer
     permission_classes = [IsAuthenticatedWithCookie]
 
+    def get_queryset(self):
+        return Car.objects.filter(creator=self.request.user)
+
 class CarsListCreateView(generics.ListCreateAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
     permission_classes = [IsAuthenticatedWithCookie]
+
+    def get_queryset(self):
+        return Car.objects.filter(creator=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
@@ -20,3 +26,6 @@ class CarNameListView(generics.ListAPIView):
     queryset = Car.objects.all().only('id', 'customer_name')
     serializer_class = CarNameSerializer
     permission_classes = [IsAuthenticatedWithCookie]
+
+    def get_queryset(self):
+        return Car.objects.filter(creator=self.request.user).only('id', 'customer_name')
